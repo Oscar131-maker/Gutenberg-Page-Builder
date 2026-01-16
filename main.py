@@ -35,9 +35,9 @@ async def read_root():
     return FileResponse(os.path.join(BASE_DIR, "index.html"))
 
 # Montar directorios estáticos
-# Acceso: /img/About/about_1.webp
+# Acceso: /img_wireframes/About/about_1.webp
 if os.path.exists(IMG_DIR):
-    app.mount("/img", StaticFiles(directory=IMG_DIR), name="images")
+    app.mount("/img_wireframes", StaticFiles(directory=IMG_DIR), name="images")
 
 # Acceso: /wireframes/About/about_1.html
 if os.path.exists(KADENCE_DIR):
