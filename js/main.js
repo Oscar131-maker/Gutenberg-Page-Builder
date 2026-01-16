@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!widgetName) return;
 
         const placeholder = layoutStructure.querySelector('.placeholder-text');
-        if(placeholder) placeholder.style.display = 'none';
+        if (placeholder) placeholder.style.display = 'none';
 
         createLayoutItem(widgetName, e.clientY);
     }
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.target.closest('.layout-item').remove();
             if (layoutStructure.querySelectorAll('.layout-item').length === 0) {
                 const placeholder = layoutStructure.querySelector('.placeholder-text');
-                if(placeholder) placeholder.style.display = 'block';
+                if (placeholder) placeholder.style.display = 'block';
             }
         }
     }
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         item.dataset.widgetName = name;
         item.setAttribute('draggable', 'true');
         item.innerHTML = `<span>${name}</span><button class="delete-btn">&times;</button>`;
-        
+
         const afterElement = getDragAfterElement(layoutStructure, clientY);
         if (afterElement == null) {
             layoutStructure.appendChild(item);
@@ -268,20 +268,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const htmlFilePromises = Array.from(previewSections).map(section => {
                 const widgetName = section.dataset.widgetName;
                 const selectedImageFile = section.querySelector('select').value;
-                
+
                 imagePaths.push(`img_wireframes/${widgetName}/${selectedImageFile}`);
 
                 const imageIndex = manifestData[widgetName].images.indexOf(selectedImageFile);
                 const htmlFileName = manifestData[widgetName].html[imageIndex];
-                
+
                 if (htmlFileName) {
-                    return fetch(`kadence_wireframes/${widgetName}/${htmlFileName}`).then(res => res.ok ? res.text() : '');
+                    return fetch(`wireframes/${widgetName}/${htmlFileName}`).then(res => res.ok ? res.text() : '');
                 }
                 return Promise.resolve('');
             });
 
             const htmlContents = await Promise.all(htmlFilePromises);
-            const finalHtml = htmlContents.join('');
+            const finalHtml = htmlContents.join('\n');
             zip.file(`${projectName}.html`, finalHtml);
 
             // --- 2. Generar imagen PNG de alta calidad ---
@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.drawImage(img, 0, currentY);
                 currentY += img.height;
             });
-            
+
             const pngBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 1.0));
             zip.file(`${projectName}.png`, pngBlob);
 
