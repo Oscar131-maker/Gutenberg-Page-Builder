@@ -11,9 +11,21 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # En producción, puedes restringir esto a tu dominio frontend
     allow_credentials=True,
-    allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Optimización: Compresión Gzip
+from fastapi.middleware.gzip import GZipMiddleware
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+# Optimización: Caché Agresivo para estáticos
+@app.middleware("http")
+async def cache_control_middleware(request, call_next):
+    response = await call_next(request)
+    # Aplicar caché de 1 año (31536000 segundos) a imágenes y wireframes
+    if request.url.path.startswith(("/img_wireframes", "/wireframes", "/css", "/js")):
+        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+    return response
 
 # Definir rutas absolutas basadas en la ubicación de este archivo
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

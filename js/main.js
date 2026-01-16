@@ -173,6 +173,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const img = document.createElement('img');
             img.src = `img_wireframes/${widgetName}/${randomImage}`;
             img.alt = `Preview for ${widgetName}`;
+            img.loading = "lazy"; // Optimización: Carga diferida
+            img.decoding = "async"; // Optimización: Decodificación asíncrona
 
             const controls = createPreviewControls(widgetData.images, randomImage);
             previewSection.appendChild(img);
