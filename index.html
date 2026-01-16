@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relume Clone - Page Builder</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="main-header">
+        <h1>Page Builder</h1>
+        <div class="project-controls">
+            <input type="text" id="project-name" placeholder="Nombre del Proyecto...">
+            <button id="update-btn" class="control-btn">Actualizar</button>
+            <button id="export-btn" class="control-btn">Exportar</button>
+            <button id="clear-btn" class="control-btn danger">Clear</button>
+        </div>
+    </header>
+
+    <main class="builder-container">
+        <aside id="widget-list-container" class="builder-column">
+            <h2>Widgets</h2>
+            <div id="widget-list" class="widget-list">
+                <!-- Widgets se cargarán aquí desde JS -->
+            </div>
+        </aside>
+
+        <section id="layout-structure-container" class="builder-column">
+            <h2>Layout Structure</h2>
+            <div id="layout-structure" class="layout-structure-area">
+                <p class="placeholder-text">Arrastra y suelta widgets aquí</p>
+            </div>
+        </section>
+
+        <section id="output-container" class="builder-column">
+            <h2>Output Preview</h2>
+            <div id="output-preview" class="output-preview-area">
+                <p class="placeholder-text">Presiona "Actualizar" para ver la previsualización</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- JS Libraries for Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <!-- Main App Logic -->
+    <script src="js/main.js" type="module"></script>
+</body>
+</html>
