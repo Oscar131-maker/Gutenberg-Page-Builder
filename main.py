@@ -2,41 +2,43 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.middleware.gzip import GZipMiddleware
 import os
 
 app = FastAPI()
 
-# Configurar CORS (Permite que otras webs accedan a tus imágenes/datos)
+# Configurar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # En producción, puedes restringir esto a tu dominio frontend
+    allow_origins=["*"],
     allow_credentials=True,
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Optimización: Compresión Gzip
-from fastapi.middleware.gzip import GZipMiddleware
+# Optimización: Compresión Gzip (Reduce el tamaño de HTML/JS/JSON)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
-# Optimización: Caché Agresivo para estáticos
-@app.middleware("http")
-async def cache_control_middleware(request, call_next):
-    response = await call_next(request)
-    # Aplicar caché de 1 año (31536000 segundos) a imágenes y wireframes
-    if request.url.path.startswith(("/img_wireframes", "/wireframes", "/css", "/js")):
-        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
-    return response
+# CLASE PERSONALIZADA PARA CACHÉ ESTÁTICO
+# Esto asegura que cada imagen se sirva con instrucciones de guardado inmediato.
+class CacheControlStaticFiles(StaticFiles):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-# Definir rutas absolutas basadas en la ubicación de este archivo
+    def file_response(self, *args, **kwargs):
+        response = super().file_response(*args, **kwargs)
+        # Cache por 1 año (31536000 seg)
+        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        return response
+
+# Definir rutas
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 IMG_DIR = os.path.join(BASE_DIR, "img_wireframes")
 KADENCE_DIR = os.path.join(BASE_DIR, "kadence_wireframes")
-
-# Rutas para CSS y JS
 CSS_DIR = os.path.join(BASE_DIR, "css")
 JS_DIR = os.path.join(BASE_DIR, "js")
 
-# Servir manifest.json en el root o en un endpoint específico
+# Servir manifest.json
 @app.get("/manifest.json")
 async def get_manifest():
     return FileResponse(os.path.join(BASE_DIR, "manifest.json"))
@@ -46,24 +48,20 @@ async def get_manifest():
 async def read_root():
     return FileResponse(os.path.join(BASE_DIR, "index.html"))
 
-# Montar directorios estáticos
-# Acceso: /img_wireframes/About/about_1.webp
+# Montar directorios usando la clase optimizada
 if os.path.exists(IMG_DIR):
-    app.mount("/img_wireframes", StaticFiles(directory=IMG_DIR), name="images")
+    app.mount("/img_wireframes", CacheControlStaticFiles(directory=IMG_DIR), name="images")
 
-# Acceso: /wireframes/About/about_1.html
 if os.path.exists(KADENCE_DIR):
-    app.mount("/wireframes", StaticFiles(directory=KADENCE_DIR), name="wireframes")
+    app.mount("/wireframes", CacheControlStaticFiles(directory=KADENCE_DIR), name="wireframes")
 
-# Acceso: /css/style.css
 if os.path.exists(CSS_DIR):
-    app.mount("/css", StaticFiles(directory=CSS_DIR), name="css")
+    app.mount("/css", CacheControlStaticFiles(directory=CSS_DIR), name="css")
 
-# Acceso: /js/main.js
 if os.path.exists(JS_DIR):
-    app.mount("/js", StaticFiles(directory=JS_DIR), name="js")
+    app.mount("/js", CacheControlStaticFiles(directory=JS_DIR), name="js")
 
 if __name__ == "__main__":
     import uvicorn
-    # Para correr localmente
+    # En producción Railway se encarga de esto con el Procfile
     uvicorn.run(app, host="0.0.0.0", port=8000)
