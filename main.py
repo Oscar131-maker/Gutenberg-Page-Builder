@@ -20,22 +20,19 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 IMG_DIR = os.path.join(BASE_DIR, "img_wireframes")
 KADENCE_DIR = os.path.join(BASE_DIR, "kadence_wireframes")
 
+# Rutas para CSS y JS
+CSS_DIR = os.path.join(BASE_DIR, "css")
+JS_DIR = os.path.join(BASE_DIR, "js")
+
 # Servir manifest.json en el root o en un endpoint específico
 @app.get("/manifest.json")
 async def get_manifest():
     return FileResponse(os.path.join(BASE_DIR, "manifest.json"))
 
-# También podemos servirlo como la raíz de la API si prefieres
+# Servir index.html en la raíz
 @app.get("/")
 async def read_root():
-    return {
-        "message": "Backend Wireframe API is running",
-        "endpoints": {
-            "manifest": "/manifest.json",
-            "images": "/img/{category}/{filename}",
-            "wireframes": "/wireframes/{category}/{filename}"
-        }
-    }
+    return FileResponse(os.path.join(BASE_DIR, "index.html"))
 
 # Montar directorios estáticos
 # Acceso: /img/About/about_1.webp
@@ -45,6 +42,14 @@ if os.path.exists(IMG_DIR):
 # Acceso: /wireframes/About/about_1.html
 if os.path.exists(KADENCE_DIR):
     app.mount("/wireframes", StaticFiles(directory=KADENCE_DIR), name="wireframes")
+
+# Acceso: /css/style.css
+if os.path.exists(CSS_DIR):
+    app.mount("/css", StaticFiles(directory=CSS_DIR), name="css")
+
+# Acceso: /js/main.js
+if os.path.exists(JS_DIR):
+    app.mount("/js", StaticFiles(directory=JS_DIR), name="js")
 
 if __name__ == "__main__":
     import uvicorn
